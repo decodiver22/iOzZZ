@@ -9,31 +9,43 @@ struct AlarmListView: View {
     @State private var showingAddAlarm = false
 
     var body: some View {
-        List {
-            if alarms.isEmpty {
-                ContentUnavailableView(
-                    "No Alarms",
-                    systemImage: "alarm",
-                    description: Text("Tap + to create your first alarm")
-                )
-            }
+        ZStack {
+            // Gradient background
+            LinearGradient(
+                colors: [Color(red: 0.05, green: 0.05, blue: 0.15), Color.black],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .ignoresSafeArea()
 
-            ForEach(alarms) { alarm in
-                NavigationLink {
-                    AlarmEditView(alarm: alarm)
-                } label: {
-                    AlarmRow(alarm: alarm)
+            if alarms.isEmpty {
+                emptyState
+            } else {
+                ScrollView {
+                    LazyVStack(spacing: 16) {
+                        ForEach(alarms) { alarm in
+                            NavigationLink {
+                                AlarmEditView(alarm: alarm)
+                            } label: {
+                                AlarmRow(alarm: alarm)
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                    .padding()
                 }
             }
-            .onDelete(perform: deleteAlarms)
         }
         .navigationTitle("iOzZZ")
+        .navigationBarTitleDisplayMode(.large)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
                     showingAddAlarm = true
                 } label: {
-                    Image(systemName: "plus")
+                    Image(systemName: "plus.circle.fill")
+                        .font(.title2)
+                        .foregroundStyle(.white)
                 }
             }
         }
@@ -41,6 +53,22 @@ struct AlarmListView: View {
             NavigationStack {
                 AlarmEditView(alarm: nil)
             }
+        }
+    }
+
+    private var emptyState: some View {
+        VStack(spacing: 20) {
+            Image(systemName: "alarm.waves.left.and.right.fill")
+                .font(.system(size: 80))
+                .foregroundStyle(.white.opacity(0.3))
+
+            Text("No Alarms")
+                .font(.title.bold())
+                .foregroundStyle(.white)
+
+            Text("Tap + to create your first alarm")
+                .font(.body)
+                .foregroundStyle(.white.opacity(0.6))
         }
     }
 
@@ -61,35 +89,45 @@ private struct AlarmRow: View {
     @Environment(\.modelContext) private var modelContext
 
     var body: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 4) {
+        HStack(spacing: 16) {
+            VStack(alignment: .leading, spacing: 8) {
                 Text(alarm.timeString)
-                    .font(.system(size: 40, weight: .light, design: .rounded))
+                    .font(.system(size: 48, weight: .thin, design: .rounded))
                     .monospacedDigit()
+                    .foregroundStyle(.white)
 
                 HStack(spacing: 8) {
                     Text(alarm.label)
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .font(.subheadline.weight(.medium))
+                        .foregroundStyle(.white.opacity(0.9))
+
+                    Text("•")
+                        .foregroundStyle(.white.opacity(0.4))
 
                     Text(alarm.repeatDaysString)
-                        .font(.caption)
-                        .foregroundStyle(.tertiary)
+                        .font(.subheadline)
+                        .foregroundStyle(.white.opacity(0.7))
                 }
 
-                HStack(spacing: 4) {
+                HStack(spacing: 6) {
                     Image(systemName: alarm.captchaType == .math ? "function" : "wave.3.right")
-                        .font(.caption2)
+                        .font(.caption)
                     Text(alarm.captchaType.rawValue)
-                        .font(.caption2)
+                        .font(.caption)
                 }
-                .foregroundStyle(.secondary)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 4)
+                .background(.white.opacity(0.1))
+                .clipShape(Capsule())
+                .foregroundStyle(.white.opacity(0.8))
             }
 
             Spacer()
 
             Toggle("", isOn: $alarm.isEnabled)
                 .labelsHidden()
+                .tint(.green)
+                .scaleEffect(1.1)
                 .onChange(of: alarm.isEnabled) { _, newValue in
                     Task {
                         if newValue {
@@ -100,7 +138,16 @@ private struct AlarmRow: View {
                     }
                 }
         }
-        .padding(.vertical, 4)
+        .padding(20)
+        .background(
+            RoundedRectangle(cornerRadius: 20)
+                .fill(.white.opacity(0.08))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 20)
+                        .stroke(.white.opacity(0.1), lineWidth: 1)
+                )
+        )
+        .shadow(color: .black.opacity(0.3), radius: 10, y: 5)
     }
 }
 

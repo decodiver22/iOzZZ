@@ -6,6 +6,10 @@
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleName</key>
+	<string>$(PRODUCT_NAME)</string>
+	<key>CFBundleDisplayName</key>
+	<string>iOzZZ</string>
 	<key>NSAlarmKitUsageDescription</key>
 	<string>iOzZZ needs alarm access to wake you up at your scheduled times and require a captcha to dismiss.</string>
 	<key>NFCReaderUsageDescription</key>
