@@ -2,11 +2,12 @@ import Foundation
 import AlarmKit
 import Observation
 
+@MainActor
 @Observable
 final class AlarmService {
     static let shared = AlarmService()
 
-    private let manager = AlarmManager.shared
+    nonisolated(unsafe) private let manager = AlarmManager.shared
 
     var isAuthorized = false
 
@@ -40,7 +41,7 @@ final class AlarmService {
     // MARK: - Schedule
 
     func scheduleAlarm(_ alarm: AlarmModel) async throws {
-        guard isAuthorized else {
+        if !isAuthorized {
             let granted = await requestAuthorization()
             guard granted else { return }
         }
@@ -63,7 +64,7 @@ final class AlarmService {
 
         // Alert presentation: stop = snooze (re-fires), secondary = dismiss (opens app)
         let alert = AlarmPresentation.Alert(
-            title: alarm.label,
+            title: LocalizedStringResource(stringLiteral: alarm.label),
             stopButton: snoozeButton,
             secondaryButton: dismissButton,
             secondaryButtonBehavior: .custom
@@ -91,7 +92,7 @@ final class AlarmService {
         let stopIntent = SnoozeAlarmIntent(alarmIdentifier: id.uuidString)
         let secondaryIntent = DismissAlarmIntent(alarmIdentifier: id.uuidString)
 
-        let config = AlarmManager.AlarmConfiguration(
+        let config = AlarmManager.AlarmConfiguration<AlarmMetadataType>(
             countdownDuration: countdownDuration,
             schedule: schedule,
             attributes: attributes,

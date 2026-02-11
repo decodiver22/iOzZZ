@@ -4,9 +4,9 @@ import AlarmKit
 /// Intent triggered by the "Dismiss" secondary button on the alarm Live Activity.
 /// Opens the app so the user must solve a captcha before the alarm is actually stopped.
 struct DismissAlarmIntent: LiveActivityIntent {
-    static var title: LocalizedStringResource = "Dismiss Alarm"
-    static var description = IntentDescription("Opens the app to dismiss the alarm with a captcha")
-    static var openAppWhenRun = true
+    nonisolated(unsafe) static var title: LocalizedStringResource = "Dismiss Alarm"
+    nonisolated(unsafe) static var description = IntentDescription("Opens the app to dismiss the alarm with a captcha")
+    nonisolated(unsafe) static var openAppWhenRun = true
 
     @Parameter(title: "Alarm Identifier")
     var alarmIdentifier: String
@@ -33,9 +33,9 @@ struct DismissAlarmIntent: LiveActivityIntent {
 /// Intent triggered by the "Snooze" stop button.
 /// The system handles the snooze via postAlert countdown duration.
 struct SnoozeAlarmIntent: LiveActivityIntent {
-    static var title: LocalizedStringResource = "Snooze Alarm"
-    static var description = IntentDescription("Snoozes the alarm")
-    static var openAppWhenRun = false
+    nonisolated(unsafe) static var title: LocalizedStringResource = "Snooze Alarm"
+    nonisolated(unsafe) static var description = IntentDescription("Snoozes the alarm")
+    nonisolated(unsafe) static var openAppWhenRun = false
 
     @Parameter(title: "Alarm Identifier")
     var alarmIdentifier: String

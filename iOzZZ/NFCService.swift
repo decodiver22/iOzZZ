@@ -1,6 +1,7 @@
 import Foundation
 import CoreNFC
 
+@MainActor
 final class NFCService: NSObject, ObservableObject {
     @Published var scannedTagID: String?
     @Published var errorMessage: String?
@@ -43,7 +44,7 @@ final class NFCService: NSObject, ObservableObject {
     }
 
     /// Convert raw tag identifier bytes to hex string
-    static func hexString(from data: Data) -> String {
+    nonisolated static func hexString(from data: Data) -> String {
         data.map { String(format: "%02X", $0) }.joined(separator: ":")
     }
 }
@@ -51,11 +52,11 @@ final class NFCService: NSObject, ObservableObject {
 // MARK: - NFCTagReaderSessionDelegate
 
 extension NFCService: NFCTagReaderSessionDelegate {
-    func tagReaderSessionDidBecomeActive(_ session: NFCTagReaderSession) {
+    nonisolated func tagReaderSessionDidBecomeActive(_ session: NFCTagReaderSession) {
         // Session started
     }
 
-    func tagReaderSession(_ session: NFCTagReaderSession, didInvalidateWithError error: Error) {
+    nonisolated func tagReaderSession(_ session: NFCTagReaderSession, didInvalidateWithError error: Error) {
         DispatchQueue.main.async {
             self.isScanning = false
             if let nfcError = error as? NFCReaderError,
@@ -65,7 +66,7 @@ extension NFCService: NFCTagReaderSessionDelegate {
         }
     }
 
-    func tagReaderSession(_ session: NFCTagReaderSession, didDetect tags: [NFCTag]) {
+    nonisolated func tagReaderSession(_ session: NFCTagReaderSession, didDetect tags: [NFCTag]) {
         guard let tag = tags.first else {
             session.invalidate(errorMessage: "No tag found")
             return
