@@ -24,6 +24,8 @@ final class AlarmModel {
     var mathDifficulty: MathDifficulty
     var nfcTagID: String?
     var snoozeDurationMinutes: Int
+    var maxSnoozes: Int // 0 = unlimited, >0 = max snooze count
+    var currentSnoozeCount: Int // Tracks how many times snoozed
 
     // Phase 4: Shortcuts integration
     var onFireShortcutName: String?
@@ -39,7 +41,9 @@ final class AlarmModel {
         captchaType: CaptchaType = .math,
         mathDifficulty: MathDifficulty = .easy,
         nfcTagID: String? = nil,
-        snoozeDurationMinutes: Int = 5
+        snoozeDurationMinutes: Int = 5,
+        maxSnoozes: Int = 3,
+        currentSnoozeCount: Int = 0
     ) {
         self.id = id
         self.label = label
@@ -51,6 +55,8 @@ final class AlarmModel {
         self.mathDifficulty = mathDifficulty
         self.nfcTagID = nfcTagID
         self.snoozeDurationMinutes = snoozeDurationMinutes
+        self.maxSnoozes = maxSnoozes
+        self.currentSnoozeCount = currentSnoozeCount
     }
 
     var timeString: String {

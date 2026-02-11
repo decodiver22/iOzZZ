@@ -45,6 +45,12 @@ struct CaptchaView: View {
         // Stop the alarm in AlarmKit
         try? AlarmService.shared.stopAlarm(id: alarmID)
 
+        // Reset snooze count (captcha solved successfully)
+        if let alarm = alarm {
+            alarm.currentSnoozeCount = 0
+            print("✅ Captcha solved! Snooze count reset for alarm: \(alarm.label)")
+        }
+
         // Trigger dismiss shortcut if configured
         if let shortcutName = alarm?.onDismissShortcutName, !shortcutName.isEmpty {
             triggerShortcut(named: shortcutName)

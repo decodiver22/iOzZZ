@@ -41,12 +41,19 @@ final class AlarmService {
     // MARK: - Schedule
 
     func scheduleAlarm(_ alarm: AlarmModel) async throws {
+        print("📅 Scheduling alarm: \(alarm.timeString) (\(alarm.label))")
+
         if !isAuthorized {
+            print("⚠️ Not authorized, requesting...")
             let granted = await requestAuthorization()
-            guard granted else { return }
+            guard granted else {
+                print("❌ Authorization denied")
+                return
+            }
         }
 
         let id = alarm.id
+        print("✅ Authorized, scheduling alarm with ID: \(id)")
 
         // Build stop button = "Snooze" (system handles re-fire via postAlert)
         let snoozeButton = AlarmButton(
@@ -78,11 +85,10 @@ final class AlarmService {
             tintColor: .blue
         )
 
-        // Countdown duration: postAlert = snooze duration
-        let snoozeDuration = TimeInterval(alarm.snoozeDurationMinutes * 60)
+        // Countdown duration: no postAlert (we handle snooze manually)
         let countdownDuration = Alarm.CountdownDuration(
             preAlert: nil,
-            postAlert: snoozeDuration
+            postAlert: nil
         )
 
         // Build schedule
@@ -100,7 +106,22 @@ final class AlarmService {
             secondaryIntent: secondaryIntent
         )
 
-        _ = try await manager.schedule(id: id, configuration: config)
+        let result = try await manager.schedule(id: id, configuration: config)
+
+        // Calculate when this will actually fire
+        let now = Date()
+        let nextFire = Calendar.current.date(bySettingHour: alarm.hour, minute: alarm.minute, second: 0, of: now) ?? now
+        let actualNextFire = nextFire < now ? Calendar.current.date(byAdding: .day, value: 1, to: nextFire)! : nextFire
+        let timeUntil = actualNextFire.timeIntervalSince(now)
+        let minutesUntil = Int(timeUntil / 60)
+
+        print("✅ Alarm scheduled successfully")
+        print("   - Time: \(alarm.hour):\(String(format: "%02d", alarm.minute))")
+        print("   - Repeat: \(alarm.repeatDays.isEmpty ? "One-time" : "\(alarm.repeatDays.count) days")")
+        print("   - Captcha: \(alarm.captchaType.rawValue)")
+        print("   - Snooze: \(alarm.snoozeDurationMinutes) min")
+        print("   - Will fire in: ~\(minutesUntil) minutes (\(actualNextFire.formatted(date: .omitted, time: .shortened)))")
+        print("   - Result: \(result)")
     }
 
     // MARK: - Stop & Cancel
@@ -110,7 +131,53 @@ final class AlarmService {
     }
 
     func cancelAlarm(id: UUID) throws {
+        print("🗑️ Cancelling alarm: \(id)")
         try manager.cancel(id: id)
+        print("✅ Alarm cancelled")
+    }
+
+    func snoozeAlarm(_ alarm: AlarmModel) async throws {
+        print("😴 Snoozing alarm \(alarm.label) for \(alarm.snoozeDurationMinutes) minutes")
+
+        // Cancel current alarm first
+        try? cancelAlarm(id: alarm.id)
+
+        // Calculate snooze time (X minutes from now)
+        let now = Date()
+        let snoozeTime = Calendar.current.date(byAdding: .minute, value: alarm.snoozeDurationMinutes, to: now)!
+        let components = Calendar.current.dateComponents([.hour, .minute], from: snoozeTime)
+
+        // Temporarily modify the alarm time
+        let originalHour = alarm.hour
+        let originalMinute = alarm.minute
+        alarm.hour = components.hour ?? 0
+        alarm.minute = components.minute ?? 0
+
+        // Schedule with new time
+        try await scheduleAlarm(alarm)
+
+        // Restore original time (for display purposes)
+        alarm.hour = originalHour
+        alarm.minute = originalMinute
+
+        print("✅ Alarm will re-fire at \(components.hour ?? 0):\(String(format: "%02d", components.minute ?? 0))")
+    }
+
+    // MARK: - Query Alarms
+
+    func listScheduledAlarms() async -> Int {
+        // Get all alarm IDs from AlarmKit
+        do {
+            let alarms = try await manager.alarms
+            print("📋 AlarmKit has \(alarms.count) scheduled alarm(s)")
+            for alarm in alarms {
+                print("   - Alarm ID: \(alarm.id)")
+            }
+            return alarms.count
+        } catch {
+            print("❌ Failed to list alarms: \(error)")
+            return 0
+        }
     }
 
     // MARK: - Schedule Builder

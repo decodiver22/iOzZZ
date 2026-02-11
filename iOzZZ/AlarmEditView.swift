@@ -16,6 +16,7 @@ struct AlarmEditView: View {
     @State private var mathDifficulty: MathDifficulty = .easy
     @State private var nfcTagID: String?
     @State private var snoozeDurationMinutes: Int = 5
+    @State private var maxSnoozes: Int = 3
     @State private var showingNFCRegistration = false
     @State private var errorMessage: String?
 
@@ -97,14 +98,31 @@ struct AlarmEditView: View {
                 }
             }
 
-            // Snooze Duration
-            Section("Snooze") {
+            // Snooze Settings
+            Section {
                 Picker("Duration", selection: $snoozeDurationMinutes) {
                     Text("1 min").tag(1)
                     Text("3 min").tag(3)
                     Text("5 min").tag(5)
                     Text("10 min").tag(10)
                     Text("15 min").tag(15)
+                }
+
+                Picker("Max Snoozes", selection: $maxSnoozes) {
+                    Text("Unlimited").tag(0)
+                    Text("1 snooze").tag(1)
+                    Text("2 snoozes").tag(2)
+                    Text("3 snoozes").tag(3)
+                    Text("5 snoozes").tag(5)
+                    Text("10 snoozes").tag(10)
+                }
+            } header: {
+                Text("Snooze")
+            } footer: {
+                if maxSnoozes > 0 {
+                    Text("After \(maxSnoozes) snooze(s), you must solve the captcha to dismiss")
+                } else {
+                    Text("You can snooze unlimited times")
                 }
             }
 
@@ -125,8 +143,30 @@ struct AlarmEditView: View {
                     Button("Cancel") { dismiss() }
                 }
             }
+
             ToolbarItem(placement: .confirmationAction) {
                 Button("Save") { saveAlarm() }
+            }
+        }
+        .safeAreaInset(edge: .bottom) {
+            if isEditing {
+                Button(role: .destructive) {
+                    deleteAlarm()
+                } label: {
+                    HStack(spacing: 12) {
+                        Image(systemName: "trash.fill")
+                            .font(.headline)
+                        Text("Delete Alarm")
+                            .font(.headline)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 18)
+                    .background(Color.red)
+                    .foregroundStyle(.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                }
+                .padding()
+                .background(.ultraThinMaterial)
             }
         }
         .sheet(isPresented: $showingNFCRegistration) {
@@ -146,6 +186,7 @@ struct AlarmEditView: View {
                 mathDifficulty = alarm.mathDifficulty
                 nfcTagID = alarm.nfcTagID
                 snoozeDurationMinutes = alarm.snoozeDurationMinutes
+                maxSnoozes = alarm.maxSnoozes
             }
         }
     }
@@ -166,6 +207,7 @@ struct AlarmEditView: View {
             alarm.mathDifficulty = mathDifficulty
             alarm.nfcTagID = nfcTagID
             alarm.snoozeDurationMinutes = snoozeDurationMinutes
+            alarm.maxSnoozes = maxSnoozes
 
             if alarm.isEnabled {
                 Task {
@@ -183,7 +225,8 @@ struct AlarmEditView: View {
                 captchaType: captchaType,
                 mathDifficulty: mathDifficulty,
                 nfcTagID: nfcTagID,
-                snoozeDurationMinutes: snoozeDurationMinutes
+                snoozeDurationMinutes: snoozeDurationMinutes,
+                maxSnoozes: maxSnoozes
             )
             modelContext.insert(newAlarm)
 
@@ -191,6 +234,18 @@ struct AlarmEditView: View {
                 try? await AlarmService.shared.scheduleAlarm(newAlarm)
             }
         }
+
+        dismiss()
+    }
+
+    private func deleteAlarm() {
+        guard let alarm = alarm else { return }
+
+        // Cancel in AlarmKit
+        try? AlarmService.shared.cancelAlarm(id: alarm.id)
+
+        // Delete from SwiftData
+        modelContext.delete(alarm)
 
         dismiss()
     }

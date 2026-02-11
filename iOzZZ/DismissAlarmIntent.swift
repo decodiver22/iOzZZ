@@ -1,5 +1,6 @@
 import AppIntents
 import AlarmKit
+import SwiftData
 
 /// Intent triggered by the "Dismiss" secondary button on the alarm Live Activity.
 /// Opens the app so the user must solve a captcha before the alarm is actually stopped.
@@ -31,7 +32,7 @@ struct DismissAlarmIntent: LiveActivityIntent {
 }
 
 /// Intent triggered by the "Snooze" stop button.
-/// The system handles the snooze via postAlert countdown duration.
+/// Checks snooze limit and either snoozes or forces dismiss.
 struct SnoozeAlarmIntent: LiveActivityIntent {
     nonisolated(unsafe) static var title: LocalizedStringResource = "Snooze Alarm"
     nonisolated(unsafe) static var description = IntentDescription("Snoozes the alarm")
@@ -49,16 +50,33 @@ struct SnoozeAlarmIntent: LiveActivityIntent {
     }
 
     func perform() async throws -> some IntentResult {
-        // Stop the alarm (system re-fires after postAlert duration)
-        if let uuid = UUID(uuidString: alarmIdentifier) {
-            try? AlarmManager.shared.stop(id: uuid)
+        guard let uuid = UUID(uuidString: alarmIdentifier) else {
+            return .result()
         }
+
+        // Stop the alarm first
+        try? AlarmManager.shared.stop(id: uuid)
+
+        // Post notification for snooze tracking
+        NotificationCenter.default.post(
+            name: .alarmSnoozed,
+            object: nil,
+            userInfo: ["alarmIdentifier": alarmIdentifier]
+        )
+
         return .result()
     }
 }
 
-// MARK: - Notification Name
+// MARK: - Notification Names
 
 extension Notification.Name {
     static let dismissAlarmRequested = Notification.Name("dismissAlarmRequested")
+    static let alarmSnoozed = Notification.Name("alarmSnoozed")
+}
+
+// MARK: - UUID Identifiable
+
+extension UUID: @retroactive Identifiable {
+    public var id: UUID { self }
 }
