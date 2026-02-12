@@ -1,3 +1,12 @@
+//
+//  AlarmService.swift
+//  iOzZZ
+//
+//  Service layer for AlarmKit integration.
+//  Handles alarm scheduling, cancellation, snooze re-scheduling, and authorization.
+//  Uses manual snooze re-scheduling instead of AlarmKit's postAlert for reliability.
+//
+
 import Foundation
 import AlarmKit
 import Observation
@@ -136,27 +145,41 @@ final class AlarmService {
         print("✅ Alarm cancelled")
     }
 
+    /// Manually re-schedules an alarm to fire after the snooze duration.
+    ///
+    /// This is our custom snooze implementation instead of using AlarmKit's postAlert,
+    /// which proved unreliable. The approach:
+    /// 1. Cancel the current alarm
+    /// 2. Calculate snooze fire time (now + snooze duration)
+    /// 3. Temporarily update alarm's hour/minute to match snooze time
+    /// 4. Re-schedule alarm (AlarmKit will fire at the new time)
+    /// 5. Restore original time (so UI shows the correct display time)
+    ///
+    /// - Parameter alarm: The alarm to snooze (will be modified temporarily)
+    /// - Throws: If alarm scheduling fails
     func snoozeAlarm(_ alarm: AlarmModel) async throws {
         print("😴 Snoozing alarm \(alarm.label) for \(alarm.snoozeDurationMinutes) minutes")
 
-        // Cancel current alarm first
+        // Step 1: Cancel current alarm to stop it from re-firing
         try? cancelAlarm(id: alarm.id)
 
-        // Calculate snooze time (X minutes from now)
+        // Step 2: Calculate when the alarm should re-fire (now + snooze duration)
         let now = Date()
         let snoozeTime = Calendar.current.date(byAdding: .minute, value: alarm.snoozeDurationMinutes, to: now)!
         let components = Calendar.current.dateComponents([.hour, .minute], from: snoozeTime)
 
-        // Temporarily modify the alarm time
+        // Step 3: Temporarily update alarm time to the snooze time
+        // We need to do this because scheduleAlarm() reads hour/minute from the model
         let originalHour = alarm.hour
         let originalMinute = alarm.minute
         alarm.hour = components.hour ?? 0
         alarm.minute = components.minute ?? 0
 
-        // Schedule with new time
+        // Step 4: Schedule with the snooze time
         try await scheduleAlarm(alarm)
 
-        // Restore original time (for display purposes)
+        // Step 5: Restore original display time
+        // This ensures the UI shows "8:00" not "8:05" after a snooze
         alarm.hour = originalHour
         alarm.minute = originalMinute
 
@@ -182,15 +205,28 @@ final class AlarmService {
 
     // MARK: - Schedule Builder
 
+    /// Builds an AlarmKit schedule from our alarm model.
+    ///
+    /// AlarmKit supports two schedule types:
+    /// - `.relative()` for time-of-day alarms (e.g., "8:00 AM every day")
+    /// - `.fixed()` for absolute dates (e.g., "Jan 1, 2026 at 9:00 AM")
+    ///
+    /// We always use `.relative()` since we want alarms to fire at specific times.
+    /// For one-time alarms, we use relative without recurrence (fires once, then done).
+    /// For recurring alarms, we use weekly recurrence with selected weekdays.
+    ///
+    /// - Parameter alarm: The alarm model to convert
+    /// - Returns: AlarmKit schedule configuration
     private func buildSchedule(for alarm: AlarmModel) -> Alarm.Schedule {
         let time = Alarm.Schedule.Relative.Time(hour: alarm.hour, minute: alarm.minute)
 
         if alarm.repeatDays.isEmpty {
-            // One-time alarm: relative schedule without recurrence
+            // One-time alarm: fires once at the specified time, then auto-cancels
             let relative = Alarm.Schedule.Relative(time: time)
             return .relative(relative)
         } else {
-            // Recurring alarm: weekly recurrence on selected days
+            // Recurring alarm: fires weekly on selected days
+            // Convert Calendar weekday values (1=Sun, 2=Mon, etc.) to Locale.Weekday
             let weekdays = alarm.repeatDays.sorted().compactMap { calendarWeekday in
                 Locale.Weekday(calendarWeekday)
             }

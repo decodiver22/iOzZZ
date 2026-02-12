@@ -1,3 +1,11 @@
+//
+//  AlarmListView.swift
+//  iOzZZ
+//
+//  Main alarm list view with large card layout, liquid glass effects, and swipe-to-delete.
+//  Shows empty state when no alarms exist. Includes debug menu for testing (DEBUG builds only).
+//
+
 import SwiftUI
 import SwiftData
 

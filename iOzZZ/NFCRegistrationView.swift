@@ -1,3 +1,11 @@
+//
+//  NFCRegistrationView.swift
+//  iOzZZ
+//
+//  NFC tag registration flow.
+//  Allows users to scan and name NFC tags for use as alarm dismiss captchas.
+//
+
 import SwiftUI
 import SwiftData
 

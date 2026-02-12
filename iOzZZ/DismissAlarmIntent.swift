@@ -1,3 +1,12 @@
+//
+//  DismissAlarmIntent.swift
+//  iOzZZ
+//
+//  Live Activity intents for alarm interaction.
+//  - DismissAlarmIntent: Opens app to show captcha (secondary button)
+//  - SnoozeAlarmIntent: Stops alarm and re-schedules it (stop button)
+//
+
 import AppIntents
 import AlarmKit
 import SwiftData
@@ -66,13 +75,6 @@ struct SnoozeAlarmIntent: LiveActivityIntent {
 
         return .result()
     }
-}
-
-// MARK: - Notification Names
-
-extension Notification.Name {
-    static let dismissAlarmRequested = Notification.Name("dismissAlarmRequested")
-    static let alarmSnoozed = Notification.Name("alarmSnoozed")
 }
 
 // MARK: - UUID Identifiable

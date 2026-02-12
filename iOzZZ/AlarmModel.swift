@@ -1,3 +1,12 @@
+//
+//  AlarmModel.swift
+//  iOzZZ
+//
+//  SwiftData model for alarm configurations.
+//  The alarm ID is shared between SwiftData and AlarmKit (same UUID).
+//  Includes captcha settings, snooze limits, and repeat schedule.
+//
+
 import Foundation
 import SwiftData
 

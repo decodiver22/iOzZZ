@@ -1,3 +1,11 @@
+//
+//  MathCaptchaView.swift
+//  iOzZZ
+//
+//  Math problem captcha UI with immersive full-screen design.
+//  Generates new problem on wrong answer, tracks attempts, shows validation feedback.
+//
+
 import SwiftUI
 
 struct MathCaptchaView: View {

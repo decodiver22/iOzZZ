@@ -1,3 +1,12 @@
+//
+//  AutoTestMode.swift
+//  iOzZZ
+//
+//  Automated testing system for alarm firing verification.
+//  Creates test alarms 90 seconds in the future and monitors for successful firing.
+//  DEBUG builds only - helps test AlarmKit integration without manual waiting.
+//
+
 import SwiftUI
 import SwiftData
 

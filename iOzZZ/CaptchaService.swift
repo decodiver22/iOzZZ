@@ -1,3 +1,12 @@
+//
+//  CaptchaService.swift
+//  iOzZZ
+//
+//  Pure math captcha generation and validation logic.
+//  No dependencies on UI or other services - stateless utility functions.
+//  Supports three difficulty levels: Easy (add/subtract), Medium (multiply), Hard (multi-step).
+//
+
 import Foundation
 
 struct MathProblem {

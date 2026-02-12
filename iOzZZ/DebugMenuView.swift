@@ -1,3 +1,12 @@
+//
+//  DebugMenuView.swift
+//  iOzZZ
+//
+//  Debug menu for testing alarm features without waiting.
+//  Accessible via triple-tap gesture. Allows manual captcha triggering and alarm status checks.
+//  DEBUG builds only.
+//
+
 import SwiftUI
 import SwiftData
 

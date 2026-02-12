@@ -1,3 +1,11 @@
+//
+//  NFCTagModel.swift
+//  iOzZZ
+//
+//  SwiftData model for registered NFC tags.
+//  Stores tag identifier (hex string from NFC UID) and user-assigned name.
+//
+
 import Foundation
 import SwiftData
 

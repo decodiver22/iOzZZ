@@ -1,3 +1,11 @@
+//
+//  Extensions.swift
+//  iOzZZ
+//
+//  Utility extensions for Date and Int types.
+//  Provides helper methods for alarm time calculations and weekday formatting.
+//
+
 import Foundation
 
 extension Date {

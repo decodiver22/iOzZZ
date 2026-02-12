@@ -1,3 +1,12 @@
+//
+//  NFCService.swift
+//  iOzZZ
+//
+//  NFC tag scanning service using Core NFC.
+//  Supports ISO 14443, ISO 15693, ISO 7816, and FeliCa tags.
+//  Includes simulator mock for development (NFC only works on physical devices).
+//
+
 import Foundation
 import CoreNFC
 

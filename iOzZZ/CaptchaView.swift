@@ -1,3 +1,11 @@
+//
+//  CaptchaView.swift
+//  iOzZZ
+//
+//  Router view that displays the appropriate captcha based on alarm configuration.
+//  Handles alarm dismissal after successful captcha solve and snooze count reset.
+//
+
 import SwiftUI
 import SwiftData
 

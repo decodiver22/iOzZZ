@@ -1,3 +1,12 @@
+//
+//  iOzZZApp.swift
+//  iOzZZ
+//
+//  App entry point and notification listener.
+//  Shows captcha overlay when alarm dismissal is requested.
+//  Coordinates snooze notifications and AlarmKit authorization.
+//
+
 import SwiftUI
 import SwiftData
 
@@ -105,9 +114,4 @@ struct iOzZZApp: App {
             userInfo: ["alarmIdentifier": alarmID.uuidString]
         )
     }
-}
-
-// Additional notification for internal handling
-extension Notification.Name {
-    static let handleSnoozeInApp = Notification.Name("handleSnoozeInApp")
 }

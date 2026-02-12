@@ -1,3 +1,12 @@
+//
+//  AlarmEditView.swift
+//  iOzZZ
+//
+//  Alarm creation and editing form.
+//  Configures time, repeat days, captcha type, snooze settings, and max snooze limits.
+//  Includes delete button at bottom when editing existing alarms.
+//
+
 import SwiftUI
 import SwiftData
 

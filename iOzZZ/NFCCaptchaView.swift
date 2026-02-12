@@ -1,3 +1,11 @@
+//
+//  NFCCaptchaView.swift
+//  iOzZZ
+//
+//  NFC captcha UI - prompts user to scan the correct NFC tag to dismiss alarm.
+//  Shows error feedback for wrong tags and tracks scan attempts.
+//
+
 import SwiftUI
 
 struct NFCCaptchaView: View {
