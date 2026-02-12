@@ -239,6 +239,9 @@ struct AlarmEditView: View {
             )
             modelContext.insert(newAlarm)
 
+            // Save to SwiftData immediately
+            try? modelContext.save()
+
             Task {
                 try? await AlarmService.shared.scheduleAlarm(newAlarm)
             }
