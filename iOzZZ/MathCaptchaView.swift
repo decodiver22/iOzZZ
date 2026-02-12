@@ -27,13 +27,13 @@ struct MathCaptchaView: View {
             )
             .ignoresSafeArea()
 
-            VStack(spacing: 32) {
+            VStack(spacing: 24) {
                 Spacer()
 
-                // Header
-                VStack(spacing: 12) {
+                // Header - more compact
+                VStack(spacing: 10) {
                     Image(systemName: "alarm.fill")
-                        .font(.system(size: 60))
+                        .font(.system(size: 48))
                         .foregroundStyle(
                             LinearGradient(
                                 colors: [.red, .orange],
@@ -41,17 +41,17 @@ struct MathCaptchaView: View {
                                 endPoint: .bottomTrailing
                             )
                         )
-                        .shadow(color: .red.opacity(0.5), radius: 20)
+                        .shadow(color: .red.opacity(0.5), radius: 15)
 
-                    Text("Solve to Dismiss")
-                        .font(.title.bold())
+                    Text("Solve to Continue")
+                        .font(.title2.bold())
                         .foregroundStyle(.white)
 
                     Text("Difficulty: \(difficulty.rawValue)")
-                        .font(.subheadline.weight(.medium))
+                        .font(.caption.weight(.medium))
                         .foregroundStyle(.white.opacity(0.7))
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 6)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 4)
                         .background(
                             Capsule()
                                 .fill(.ultraThinMaterial)
@@ -59,16 +59,16 @@ struct MathCaptchaView: View {
                         )
                 }
 
-                // Math problem - enhanced liquid glass card
+                // Math problem - more compact
                 VStack {
                     Text(problem.question)
-                        .font(.system(size: 80, weight: .semibold, design: .rounded))
+                        .font(.system(size: 56, weight: .semibold, design: .rounded))
                         .monospacedDigit()
                         .foregroundStyle(.white)
                         .minimumScaleFactor(0.5)
                         .lineLimit(1)
-                        .padding(.vertical, 48)
-                        .padding(.horizontal, 32)
+                        .padding(.vertical, 32)
+                        .padding(.horizontal, 24)
                 }
                 .frame(maxWidth: .infinity)
                 .background(
@@ -97,19 +97,19 @@ struct MathCaptchaView: View {
                             )
                     }
                 )
-                .shadow(color: .black.opacity(0.3), radius: 20, y: 10)
-                .shadow(color: .blue.opacity(0.2), radius: 30)
-                .padding(.horizontal, 24)
+                .shadow(color: .black.opacity(0.3), radius: 15, y: 8)
+                .shadow(color: .blue.opacity(0.2), radius: 20)
+                .padding(.horizontal, 20)
 
-                // Answer input
-                VStack(spacing: 16) {
+                // Answer input - more compact
+                VStack(spacing: 12) {
                     TextField("Your answer", text: $userAnswer)
                         .keyboardType(.numberPad)
-                        .font(.system(size: 48, weight: .semibold, design: .rounded))
+                        .font(.system(size: 36, weight: .semibold, design: .rounded))
                         .multilineTextAlignment(.center)
                         .foregroundStyle(.white)
-                        .padding(.vertical, 28)
-                        .padding(.horizontal, 32)
+                        .padding(.vertical, 20)
+                        .padding(.horizontal, 24)
                         .background(
                             ZStack {
                                 RoundedRectangle(cornerRadius: 20)
@@ -125,14 +125,15 @@ struct MathCaptchaView: View {
                                     )
                             }
                         )
-                        .padding(.horizontal, 24)
+                        .padding(.horizontal, 20)
 
                     if isWrong {
-                        HStack(spacing: 8) {
+                        HStack(spacing: 6) {
                             Image(systemName: "xmark.circle.fill")
+                                .font(.caption)
                                 .foregroundStyle(.red)
-                            Text("Wrong answer! Try again.")
-                                .font(.callout.weight(.medium))
+                            Text("Wrong answer!")
+                                .font(.caption.weight(.medium))
                                 .foregroundStyle(.red)
                         }
                         .transition(.scale.combined(with: .opacity))
@@ -140,26 +141,26 @@ struct MathCaptchaView: View {
 
                     if attempts > 0 {
                         Text("Attempts: \(attempts)")
-                            .font(.caption.weight(.medium))
+                            .font(.caption2.weight(.medium))
                             .foregroundStyle(.white.opacity(0.6))
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 4)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 3)
                             .background(Capsule().fill(.ultraThinMaterial).opacity(0.4))
                     }
                 }
 
-                // Submit button - enhanced
+                // Submit button - more compact
                 Button {
                     checkAnswer()
                 } label: {
-                    HStack(spacing: 16) {
+                    HStack(spacing: 12) {
                         Image(systemName: "checkmark.circle.fill")
-                            .font(.title)
-                        Text("Submit Answer")
-                            .font(.title2.bold())
+                            .font(.headline)
+                        Text("Submit")
+                            .font(.headline.bold())
                     }
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 24)
+                    .padding(.vertical, 18)
                 }
                 .background(
                     LinearGradient(
@@ -171,12 +172,12 @@ struct MathCaptchaView: View {
                     )
                 )
                 .foregroundStyle(.white)
-                .clipShape(RoundedRectangle(cornerRadius: 16))
-                .shadow(color: .green.opacity(0.3), radius: 15, y: 8)
-                .padding(.horizontal, 24)
+                .clipShape(RoundedRectangle(cornerRadius: 14))
+                .shadow(color: .green.opacity(0.3), radius: 12, y: 6)
+                .padding(.horizontal, 20)
                 .disabled(userAnswer.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
 
-                Spacer()
+                Spacer(minLength: 20)
             }
         }
         .onAppear {

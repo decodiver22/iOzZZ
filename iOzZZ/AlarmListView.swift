@@ -15,18 +15,19 @@ struct AlarmListView: View {
     private var alarms: [AlarmModel]
 
     @State private var showingAddAlarm = false
-    @State private var showingDebugMenu = false
-    @State private var testCaptchaAlarmID: UUID?
 
     var body: some View {
         ZStack {
             // Gradient background
-            LinearGradient(
-                colors: [Color(red: 0.05, green: 0.05, blue: 0.15), Color.black],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea()
+            Color.clear
+                .background(
+                    LinearGradient(
+                        colors: [Color(red: 0.05, green: 0.05, blue: 0.15), Color.black],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
+                .ignoresSafeArea()
 
             if alarms.isEmpty {
                 emptyState
@@ -55,19 +56,8 @@ struct AlarmListView: View {
         }
         .navigationTitle("iOzZZ")
         .navigationBarTitleDisplayMode(.large)
+        .toolbarBackground(.hidden, for: .navigationBar)
         .toolbar {
-            #if DEBUG
-            ToolbarItem(placement: .topBarLeading) {
-                Button {
-                    showingDebugMenu = true
-                } label: {
-                    Image(systemName: "ant.circle.fill")
-                        .font(.title3)
-                        .foregroundStyle(.white.opacity(0.7))
-                }
-            }
-            #endif
-
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
                     showingAddAlarm = true
@@ -82,25 +72,6 @@ struct AlarmListView: View {
             NavigationStack {
                 AlarmEditView(alarm: nil)
             }
-        }
-        .fullScreenCover(isPresented: $showingDebugMenu) {
-            DebugMenuView(
-                onTestCaptcha: { alarmID in
-                    testCaptchaAlarmID = alarmID
-                },
-                onClose: {
-                    showingDebugMenu = false
-                }
-            )
-        }
-        .fullScreenCover(item: $testCaptchaAlarmID) { alarmID in
-            Color.black.opacity(0.4)
-                .ignoresSafeArea()
-                .overlay {
-                    CaptchaView(alarmID: alarmID) {
-                        testCaptchaAlarmID = nil
-                    }
-                }
         }
     }
 

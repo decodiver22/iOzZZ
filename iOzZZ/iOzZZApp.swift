@@ -13,29 +13,11 @@ import SwiftData
 @main
 struct iOzZZApp: App {
     @State private var captchaAlarmID: UUID?
-    @State private var showDebugMenu = false
-    @StateObject private var autoTest = AutoTestMode.shared
 
     var body: some Scene {
         WindowGroup {
             ZStack {
                 ContentView()
-
-                // Debug menu (triple tap to show)
-                if showDebugMenu {
-                    DebugMenuView(
-                        onTestCaptcha: { alarmID in
-                            withAnimation {
-                                captchaAlarmID = alarmID
-                            }
-                        },
-                        onClose: {
-                            showDebugMenu = false
-                        }
-                    )
-                    .transition(.scale.combined(with: .opacity))
-                    .zIndex(999)
-                }
 
                 // Captcha overlay - shown when user taps "Dismiss" on alarm
                 if let alarmID = captchaAlarmID {
@@ -51,38 +33,21 @@ struct iOzZZApp: App {
                 }
             }
             .animation(.spring(duration: 0.4), value: captchaAlarmID)
-            .animation(.spring(duration: 0.3), value: showDebugMenu)
-            .onTapGesture(count: 3) {
-                showDebugMenu.toggle()
-            }
             .task {
                 let authorized = await AlarmService.shared.requestAuthorization()
                 print("✅ AlarmKit authorization: \(authorized ? "granted" : "denied")")
-
-                #if DEBUG
-                // Start auto-test mode after a short delay
-                try? await Task.sleep(for: .seconds(2))
-                print("🤖 Starting auto-test mode in 2 seconds...")
-                #endif
             }
             .onReceive(
                 NotificationCenter.default.publisher(for: .dismissAlarmRequested)
             ) { notification in
-                print("📬 Received dismissAlarmRequested notification")
-                autoTest.reportAlarmFired()
-
                 guard let idString = notification.userInfo?["alarmIdentifier"] as? String,
                       let uuid = UUID(uuidString: idString) else {
-                    print("⚠️ Failed to parse alarm ID from notification")
                     return
                 }
 
-                print("✅ Showing captcha for alarm: \(uuid)")
                 withAnimation {
                     captchaAlarmID = uuid
                 }
-
-                autoTest.reportCaptchaShown()
 
                 // Trigger fire shortcut if configured
                 triggerFireShortcutIfNeeded(for: uuid)

@@ -11,35 +11,13 @@ import SwiftData
 
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
-    @StateObject private var autoTest = AutoTestMode.shared
     @Query private var alarms: [AlarmModel]
 
     var body: some View {
         NavigationStack {
             AlarmListView()
+                .toolbarColorScheme(.dark, for: .navigationBar)
         }
-        #if DEBUG
-        .overlay(alignment: .bottom) {
-            if autoTest.isTestRunning {
-                VStack(spacing: 8) {
-                    Text("🤖 AUTO TEST")
-                        .font(.caption.bold())
-                    Text(autoTest.testStatus)
-                        .font(.caption2)
-                }
-                .foregroundStyle(.white)
-                .padding()
-                .background(.blue.opacity(0.8))
-                .clipShape(RoundedRectangle(cornerRadius: 12))
-                .padding()
-            }
-        }
-        .task {
-            // Start auto-test after a delay
-            try? await Task.sleep(for: .seconds(3))
-            autoTest.startAutoTest(modelContext: modelContext)
-        }
-        #endif
         .onReceive(NotificationCenter.default.publisher(for: .handleSnoozeInApp)) { notification in
             guard let idString = notification.userInfo?["alarmIdentifier"] as? String,
                   let uuid = UUID(uuidString: idString) else {

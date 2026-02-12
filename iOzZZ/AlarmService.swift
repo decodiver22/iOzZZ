@@ -64,18 +64,18 @@ final class AlarmService {
         let id = alarm.id
         print("✅ Authorized, scheduling alarm with ID: \(id)")
 
-        // Build stop button = "Snooze" (system handles re-fire via postAlert)
+        // Build stop button = "Snooze"
         let snoozeButton = AlarmButton(
             text: "Snooze",
             textColor: .white,
-            systemImageName: "clock.arrow.trianglehead.2.counterclockwise.rotate.90"
+            systemImageName: "moon.zzz.fill"
         )
 
-        // Build secondary button = "Dismiss" (opens app for captcha)
+        // Build secondary button = "Turn Off" (opens app for captcha)
         let dismissButton = AlarmButton(
-            text: "Dismiss",
+            text: "Turn Off",
             textColor: .white,
-            systemImageName: "checkmark.circle.fill"
+            systemImageName: "hand.raised.fill"
         )
 
         // Alert presentation: stop = snooze (re-fires), secondary = dismiss (opens app)
