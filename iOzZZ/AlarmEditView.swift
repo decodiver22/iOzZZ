@@ -144,6 +144,15 @@ struct AlarmEditView: View {
                 }
             }
         }
+        .scrollContentBackground(.hidden)
+        .background(
+            LinearGradient(
+                colors: [Color(red: 0.08, green: 0.08, blue: 0.20), Color.black],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .ignoresSafeArea()
+        )
         .navigationTitle(isEditing ? "Edit Alarm" : "New Alarm")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -162,19 +171,20 @@ struct AlarmEditView: View {
                 Button(role: .destructive) {
                     deleteAlarm()
                 } label: {
-                    HStack(spacing: 12) {
+                    HStack(spacing: 8) {
                         Image(systemName: "trash.fill")
-                            .font(.headline)
+                            .font(.subheadline)
                         Text("Delete Alarm")
-                            .font(.headline)
+                            .font(.subheadline.weight(.semibold))
                     }
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 18)
+                    .padding(.vertical, 12)
                     .background(Color.red)
                     .foregroundStyle(.white)
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
                 }
-                .padding()
+                .padding(.horizontal)
+                .padding(.bottom, 8)
                 .background(.ultraThinMaterial)
             }
         }

@@ -14,18 +14,20 @@ struct ContentView: View {
     @Query private var alarms: [AlarmModel]
 
     var body: some View {
-        NavigationStack {
-            AlarmListView()
-                .toolbarColorScheme(.dark, for: .navigationBar)
-        }
-        .background(
+        ZStack {
+            // Full-screen gradient - absolute bottom layer
             LinearGradient(
                 colors: [Color(red: 0.08, green: 0.08, blue: 0.20), Color.black],
                 startPoint: .top,
                 endPoint: .bottom
             )
-            .ignoresSafeArea()
-        )
+            .ignoresSafeArea(edges: .all)
+
+            NavigationStack {
+                AlarmListView()
+                    .toolbarColorScheme(.dark, for: .navigationBar)
+            }
+        }
         .onReceive(NotificationCenter.default.publisher(for: .handleSnoozeInApp)) { notification in
             guard let idString = notification.userInfo?["alarmIdentifier"] as? String,
                   let uuid = UUID(uuidString: idString) else {
