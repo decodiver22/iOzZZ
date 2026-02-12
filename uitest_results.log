@@ -1,0 +1,6 @@
+Command line invocation:
+    /Users/e.weszelits/Downloads/Xcode.app/Contents/Developer/usr/bin/xcodebuild test -scheme iOzZZ -destination "platform=iOS Simulator,id=8EDDFEBC-0E13-45D4-B294-DF347B87BCE9" "-only-testing:iOzZZUITests"
+
+2026-02-11 23:18:40.241 xcodebuild[5580:491156] [MT] IDERunDestination: Supported platforms for the buildables in the current scheme is empty.
+2026-02-11 23:18:40.262 xcodebuild[5580:491156] Writing error result bundle to /var/folders/xm/28p5jpj10c351myj4wtl6f1m0000gp/T/ResultBundle_2026-11-02_23-18-0040.xcresult
+xcodebuild: error: Failed to build project iOzZZ with scheme iOzZZ.: Tests in the target “iOzZZUITests” can’t be run because “iOzZZUITests” isn’t a member of the specified test plan or scheme.

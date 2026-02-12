@@ -94,9 +94,10 @@ final class AlarmService {
             tintColor: .blue
         )
 
-        // Countdown duration: no postAlert (we handle snooze manually)
+        // Countdown duration: minimal preAlert required by AlarmKit
+        // We don't use postAlert since we handle snooze manually
         let countdownDuration = Alarm.CountdownDuration(
-            preAlert: nil,
+            preAlert: 1.0,  // 1 second
             postAlert: nil
         )
 

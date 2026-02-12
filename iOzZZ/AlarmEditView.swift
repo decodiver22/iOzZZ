@@ -201,13 +201,17 @@ struct AlarmEditView: View {
     }
 
     private func saveAlarm() {
+        print("🔵 Save alarm button tapped")
+
         if captchaType == .nfc && nfcTagID == nil {
             errorMessage = "Please register and select an NFC tag"
+            print("❌ NFC tag required but not selected")
             return
         }
 
         if let alarm {
             // Update existing
+            print("📝 Updating existing alarm: \(alarm.id)")
             alarm.label = label
             alarm.hour = hour
             alarm.minute = minute
@@ -226,6 +230,7 @@ struct AlarmEditView: View {
             }
         } else {
             // Create new
+            print("➕ Creating new alarm")
             let newAlarm = AlarmModel(
                 label: label,
                 hour: hour,
@@ -237,16 +242,35 @@ struct AlarmEditView: View {
                 snoozeDurationMinutes: snoozeDurationMinutes,
                 maxSnoozes: maxSnoozes
             )
+            print("   - ID: \(newAlarm.id)")
+            print("   - Time: \(newAlarm.timeString)")
+            print("   - Label: \(newAlarm.label)")
+
             modelContext.insert(newAlarm)
+            print("✅ Inserted into modelContext")
 
             // Save to SwiftData immediately
-            try? modelContext.save()
+            do {
+                try modelContext.save()
+                print("✅ ModelContext saved successfully")
+            } catch {
+                print("❌ Failed to save modelContext: \(error)")
+                errorMessage = "Failed to save alarm: \(error.localizedDescription)"
+                return
+            }
 
             Task {
-                try? await AlarmService.shared.scheduleAlarm(newAlarm)
+                print("🚀 Starting alarm scheduling task")
+                do {
+                    try await AlarmService.shared.scheduleAlarm(newAlarm)
+                    print("✅ Alarm scheduled successfully")
+                } catch {
+                    print("❌ Failed to schedule alarm: \(error)")
+                }
             }
         }
 
+        print("👋 Dismissing edit view")
         dismiss()
     }
 
