@@ -18,22 +18,11 @@ struct AlarmListView: View {
 
     var body: some View {
         ZStack {
-            // Gradient background
-            Color.clear
-                .background(
-                    LinearGradient(
-                        colors: [Color(red: 0.05, green: 0.05, blue: 0.15), Color.black],
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
-                )
-                .ignoresSafeArea()
-
             if alarms.isEmpty {
                 emptyState
             } else {
                 ScrollView {
-                    LazyVStack(spacing: 24) {
+                    LazyVStack(spacing: 16) {
                         ForEach(alarms) { alarm in
                             NavigationLink {
                                 AlarmEditView(alarm: alarm)
@@ -54,9 +43,13 @@ struct AlarmListView: View {
                 }
             }
         }
+        .scrollContentBackground(.hidden)
         .navigationTitle("iOzZZ")
         .navigationBarTitleDisplayMode(.large)
-        .toolbarBackground(.hidden, for: .navigationBar)
+        .toolbarBackground(.clear, for: .navigationBar)
+        .containerBackground(for: .navigation) {
+            Color.clear
+        }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
@@ -80,7 +73,7 @@ struct AlarmListView: View {
             Spacer()
 
             Image(systemName: "alarm.waves.left.and.right.fill")
-                .font(.system(size: 120))
+                .font(.system(size: 80))
                 .foregroundStyle(
                     LinearGradient(
                         colors: [.white.opacity(0.4), .white.opacity(0.2)],
@@ -92,11 +85,11 @@ struct AlarmListView: View {
 
             VStack(spacing: 12) {
                 Text("No Alarms")
-                    .font(.system(size: 40, weight: .bold, design: .rounded))
+                    .font(.system(size: 32, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
 
                 Text("Tap + to create your first alarm")
-                    .font(.title3)
+                    .font(.body)
                     .foregroundStyle(.white.opacity(0.7))
                     .multilineTextAlignment(.center)
             }
@@ -120,11 +113,11 @@ private struct AlarmRow: View {
     @Environment(\.modelContext) private var modelContext
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
+        VStack(alignment: .leading, spacing: 16) {
             // Top row: Time and Toggle
             HStack(alignment: .top) {
                 Text(alarm.timeString)
-                    .font(.system(size: 72, weight: .thin, design: .rounded))
+                    .font(.system(size: 48, weight: .thin, design: .rounded))
                     .monospacedDigit()
                     .foregroundStyle(.white)
 
@@ -133,7 +126,7 @@ private struct AlarmRow: View {
                 Toggle("", isOn: $alarm.isEnabled)
                     .labelsHidden()
                     .tint(.green)
-                    .scaleEffect(1.3)
+                    .scaleEffect(1.2)
                     .onChange(of: alarm.isEnabled) { _, newValue in
                         Task {
                             if newValue {
@@ -148,14 +141,14 @@ private struct AlarmRow: View {
             // Label and repeat info
             HStack(spacing: 12) {
                 Text(alarm.label)
-                    .font(.title3.weight(.semibold))
+                    .font(.body.weight(.semibold))
                     .foregroundStyle(.white.opacity(0.95))
 
                 Text("•")
                     .foregroundStyle(.white.opacity(0.5))
 
                 Text(alarm.repeatDaysString)
-                    .font(.callout.weight(.medium))
+                    .font(.subheadline.weight(.medium))
                     .foregroundStyle(.white.opacity(0.75))
             }
 
@@ -198,7 +191,7 @@ private struct AlarmRow: View {
                 }
             }
         }
-        .padding(28)
+        .padding(20)
         .background(
             ZStack {
                 // Liquid glass effect with blur

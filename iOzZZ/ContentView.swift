@@ -18,6 +18,14 @@ struct ContentView: View {
             AlarmListView()
                 .toolbarColorScheme(.dark, for: .navigationBar)
         }
+        .background(
+            LinearGradient(
+                colors: [Color(red: 0.08, green: 0.08, blue: 0.20), Color.black],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .ignoresSafeArea()
+        )
         .onReceive(NotificationCenter.default.publisher(for: .handleSnoozeInApp)) { notification in
             guard let idString = notification.userInfo?["alarmIdentifier"] as? String,
                   let uuid = UUID(uuidString: idString) else {
